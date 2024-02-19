@@ -9,7 +9,7 @@
         state: started
         
     - name: pull docker image
-      shell: docker pull vivekdocker23/speminiproject
+      shell: docker pull vivekdocker23/spe_mini_project
       
     - name: running container
-      shell: docker run -it -d vivekdocker23/speminiproject
+      shell: docker run -it -d vivekdocker23/spe_mini_project
