@@ -1,54 +1,63 @@
-
 pipeline {
     agent any
+
     tools {
-        maven 'Maven'
+        maven "MAVEN"
+        jdk "JDK"
+        git "Default"
     }
+    environment {
+         DOCKER_IMAGE_NAME = 'spe_mini_project'
+         GITHUB_REPO_URL = 'https://github.com/vivek-github23/sci_calc.git'
+    }
+
     stages {
-        stage('Build Maven') {
-            steps {
-                checkout scmGit(branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/vivek-github23/sci_calc.git']])
-                sh 'mvn clean install'
-            }
-        }
-         stage('Run Tests') {
+          stage('Checkout') {
             steps {
                 script {
-                    sh 'mvn test'
+                    // Checkout the code from the GitHub repository
+                    git branch: 'master', url: "${GITHUB_REPO_URL}"
                 }
             }
         }
 
-
-        stage('Build docker image') {
+        stage('Initialize'){
+            steps{
+                echo "PATH = ${M2_HOME}/bin:${PATH}"
+                echo "M2_HOME = /opt/maven"
+            }
+        }
+        stage('Build and Test') {
             steps {
                 script {
-                    sh 'docker build -t vivekdocker23/spe_mini_project .'
+                dir("/var/lib/jenkins/workspace/jenkins_pipeline/scal") {
+                sh 'mvn clean package' 
+                sh 'mvn test'
+         
+                }
+            
+            }
+        }
+        }
+     stage('Build Docker Image') {
+            steps {
+                script {
+                    // Build Docker image
+                    docker.build("${DOCKER_IMAGE_NAME}", '.')
                 }
             }
         }
-
-        stage('Push Docker image') {
+        stage('Push Docker Images') {
             steps {
-                script {
-                    withCredentials([string(credentialsId: 'DockerHubCreds', variable: 'Binding')]) {
-                        sh 'docker login -u vivekdocker23 -p ${Binding}'
-                    }
+                script{
+                    docker.withRegistry('', 'docker') {
+                    sh 'docker tag spe_mini_project  vivekdocker23/spe_mini_project:latest'
                     sh 'docker push vivekdocker23/spe_mini_project'
-                }
+                    }
+                 }
             }
         }
-        stage('Stop and Remove Existing Container') {
-                    steps {
-                        script {
-                            // Stop and remove existing container if it exists
-                             sh 'docker stop JavaContainer || true'
-                            sh 'docker rm -f JavaCalculator || true'
-                        }
-                    }
-                }
-
-         stage('Run Ansible Playbook') {
+        stage('Run Ansible Playbook') {
             steps {
                 script {
                     ansiblePlaybook(
@@ -58,5 +67,9 @@ pipeline {
                 }
             }
         }
-    }
-}
+    
+       
+     }
+    }    
+    
+
