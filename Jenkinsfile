@@ -42,7 +42,7 @@ pipeline {
         stage('Push Docker Images') {
             steps {
                 script{
-                    docker.withRegistry('', 'docker') {
+                    docker.withRegistry('https://registry.hub.docker.com', 'DockerHubCred') {
                     sh 'docker tag spe_mini_project  vivekdocker23/spe_mini_project:latest'
                     sh 'docker push vivekdocker23/spe_mini_project'
                     }
