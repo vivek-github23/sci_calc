@@ -26,11 +26,12 @@ pipeline {
                 echo "PATH = ${M2_HOME}/bin:${PATH}"
                 echo "M2_HOME = /opt/maven"
             }
-        }
+       
+
         stage('Build and Test') {
             steps {
                 script {
-                dir("/var/lib/jenkins/workspace/jenkins_pipeline/scal") {
+                dir("/home/hypernova/sci_calc/sci_calc") {
                 sh 'mvn clean package' 
                 sh 'mvn test'
          
