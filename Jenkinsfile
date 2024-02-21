@@ -44,7 +44,7 @@ pipeline {
                 script{
                     docker.withRegistry('https://registry.hub.docker.com', 'DockerHubCred') {
                     sh 'docker tag spe_mini_project  vivekdocker23/spe_mini_project:latest'
-                    sh 'docker push vivekdocker23/spe_mini_project'
+                    sh 'docker push vivekdocker2309/spe_mini_project'
                     }
                  }
             }
